@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>鸿蒙新闻</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+    body {
+      background-color: #F5F7FA;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 35px;
+    }
+    .app-page {
+      width: 375px;
+      height: 812px;
+      border: 1px solid #E5E5E5;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: white;
+      overflow: hidden;
+      position: relative;
+    }
+    .header-bar {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid #F1F3F5;
+    }
+    .category-tabs {
+      height: 44px;
+      display: flex;
+      border-bottom: 1px solid #F1F3F5;
+    }
+    .tab-item {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 15px;
+      color: #666666;
+      position: relative;
+    }
+    .tab-item.active {
+      font-weight: bold;
+      color: #182431;
+    }
+    .tab-indicator {
+      position: absolute;
+      bottom: 0;
+      height: 2px;
+      width: 40px;
+      background-color: #007DFF;
+      border-radius: 2px;
+    }
+    .content-area {
+      overflow-y: auto;
+      height: 676px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .content-area::-webkit-scrollbar {
+      display: none;
+    }
+    .news-item {
+      padding: 12px;
+      display: flex;
+      border-bottom: 1px solid #F1F3F5;
+    }
+    .news-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      background-color: #F1F3F5;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .news-content {
+      flex: 1;
+    }
+    .news-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #182431;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .news-desc {
+      font-size: 14px;
+      color: #666666;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .news-meta {
+      font-size: 12px;
+      color: #BBBBBB;
+      display: flex;
+    }
+    .news-source {
+      margin-right: 12px;
+    }
+    .nav-bar {
+      height: 80px;
+      display: flex;
+      border-top: 1px solid #F1F3F5;
+      background: white;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999999;
+    }
+    .nav-item.active {
+      color: #007DFF;
+    }
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    .detail-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #182431;
+      margin: 16px 16px 8px;
+    }
+    .detail-meta {
+      font-size: 12px;
+      color: #999999;
+      margin: 0 16px 16px;
+      display: flex;
+    }
+    .detail-content {
+      padding: 0 16px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #666666;
+    }
+    .detail-content p {
+      margin-bottom: 12px;
+    }
+    .detail-image {
+      width: 100%;
+      margin: 16px 0;
+      border-radius: 8px;
+      background-color: #F1F3F5;
+    }
+    .action-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: white;
+      border-top: 1px solid #F1F3F5;
+    }
+    .bookmark-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666666;
+      border: 1px solid #666666;
+    }
+    .bookmark-btn.active {
+      background-color: #FF6600;
+      color: white;
+      border: none;
+    }
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 16px;
+    }
+    .fullscreen-center {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 4px solid #F1F3F5;
+      border-top: 4px solid #007DFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .retry-btn {
+      background-color: #007DFF;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: bold;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+<!-- 页面1：首页新闻列表 -->
+<div class="app-page">
+<div class="header-bar">
+<div class="text-lg font-bold text-[#182431]">鸿蒙新闻</div>
+<span class="iconify" data-icon="ion:search-outline" style="color: #182431; font-size: 24px;"></span>
+</div>
+<div class="category-tabs">
+<div class="tab-item active">首页</div>
+<div class="tab-item">国内</div>
+<div class="tab-item">国际</div>
+<div class="tab-item">科技</div>
+<div class="tab-indicator" style="left: 20px"></div>
+</div>
+<div class="content-area">
+<!-- 新闻列表 -->
+<div class="news-item">
+<div class="news-thumb">
+<img alt="Technology news image" id="1" src="/agent-py/workspace/68f0f702da6e3f448f9d8520/generated_images/5a14b9b070b84a86a166f2d2aaaa2965.jpg"/>
+</div>
+<div class="news-content">
+<div class="news-title">鸿蒙系统3.0正式发布，打造全场景智慧生活新体验</div>
+<div class="news-desc">新一代分布式操作系统支持更多设备类型，实现跨终端无缝协同...</div>
+<div class="news-meta">
+<div class="news-source">新华社</div>
+<div>3小时前</div>
+</div>
+</div>
+</div>
+<div class="news-item">
+<div class="news-thumb">
+<img alt="Business conference image" id="2" src="/agent-py/workspace/68f0f702da6e3f448f9d8520/generated_images/6bfc98d69b6c434ea9a27022795dcb36.jpg"/>
+</div>
+<div class="news-content">
+<div class="news-title">华为开发者大会2022：鸿蒙生态扩展至智能汽车领域</div>
+<div class="news-desc">鸿蒙OS成为智能座舱操作系统首选，多家车企宣布搭载计划...</div>
+<div class="news-meta">
+<div class="news-source">科技日报</div>
+<div>5小时前</div>
+</div>
+</div>
+</div>
+<div class="news-item">
+<div class="news-thumb">
+<img alt="Device showcase image" id="3" src="/agent-py/workspace/68f0f702da6e3f448f9d8520/generated_images/8d0ae082f5c341d68b8d09dfc64a604f.jpg"/>
+</div>
+<div class="news-content">
+<div class="news-title">鸿蒙设备全球累计出货量突破3亿台，智能生态加速扩张</div>
+<div class="news-desc">涵盖手机、平板、智慧屏、手表等全场景终端，生态伙伴超4000家...</div>
+<div class="news-meta">
+<div class="news-source">经济观察报</div>
+<div>昨天</div>
+</div>
+</div>
+</div>
+<div class="py-3 text-center text-[#999999] text-sm">上拉加载更多</div>
+</div>
+<div class="nav-bar">
+<div class="nav-item active">
+<span class="iconify nav-icon" data-icon="ion:home"></span>
+<div>首页</div>
+</div>
+<div class="nav-item">
+<span class="iconify nav-icon" data-icon="ion:bookmark-outline"></span>
+<div>我的收藏</div>
+</div>
+</div>
+</div>
+<!-- 页面2：新闻详情页 -->
+<div class="app-page">
+<div class="header-bar">
+<span class="iconify" data-icon="ion:arrow-back-outline" style="color: #182431; font-size: 24px;"></span>
+<div class="text-lg font-bold text-[#182431]">新闻详情</div>
+<span class="iconify" data-icon="ion:share-outline" style="color: #182431; font-size: 24px;"></span>
+</div>
+<div class="content-area">
+<div class="detail-title">鸿蒙系统3.0正式发布，打造全场景智慧生活新体验</div>
+<div class="detail-meta">
+<div class="mr-4">2023年6月15日</div>
+<div>新华社</div>
+</div>
+<div class="detail-content">
+<p>华为今日正式发布鸿蒙系统3.0版本，这是继2.0之后的全新升级。新系统在分布式能力上实现重大突破，支持更多设备类型协同工作。</p>
+<div class="detail-image">
+<img alt="Harmony OS 3.0 interface" id="4" src="/agent-py/workspace/68f0f702da6e3f448f9d8520/generated_images/22304e9b14274dab80d47c50efb60d2d.jpg"/>
+</div>
+<p>鸿蒙3.0带来了全新设计的超级终端界面，用户可一键连接附近设备，实现手机、平板、智慧屏、音箱等设备的无缝协同。系统性能提升显著，应用启动速度比上代提升15%。</p>
+<p>在安全方面，新系统获得全球首个CC EAL5+安全认证，提供从芯片到系统的全方位安全防护。隐私保护功能升级，新增敏感权限使用提醒和应用行为记录功能。</p>
+<p>华为消费者业务CEO余承东表示："鸿蒙3.0标志着我们向万物互联愿景迈出重要一步，未来将开放更多能力给开发者，共建智慧生态。"</p>
+<p>目前已有超过3000万用户升级鸿蒙系统，预计到2023年底，搭载鸿蒙系统的设备将突破4亿台。多家家电厂商宣布将在新产品中预装鸿蒙系统。</p>
+</div>
+</div>
+<div class="action-bar">
+<div class="bookmark-btn active">
+<span class="iconify" data-icon="ion:heart" style="font-size: 24px;"></span>
+</div>
+</div>
+</div>
+<!-- 页面3：我的收藏页 -->
+<div class="app-page">
+<div class="header-bar">
+<span class="iconify" data-icon="ion:arrow-back-outline" style="color: #182431; font-size: 24px;"></span>
+<div class="text-lg font-bold text-[#182431]">我的收藏</div>
+</div>
+<div class="content-area">
+<!-- 收藏列表 -->
+<div class="news-item">
+<div class="news-thumb">
+<img alt="Technology news image" id="5" src="/agent-py/workspace/68f0f702da6e3f448f9d8520/generated_images/cb1932e7267d492e98368580d0ecc99b.jpg"/>
+</div>
+<div class="news-content">
+<div class="news-title">鸿蒙系统3.0正式发布，打造全场景智慧生活新体验</div>
+<div class="news-desc">新一代分布式操作系统支持更多设备类型，实现跨终端无缝协同...</div>
+<div class="news-meta">
+<div class="news-source">新华社</div>
+<div>3小时前</div>
+</div>
+</div>
+</div>
+<div class="news-item">
+<div class="news-thumb">
+<img alt="Business conference image" id="6" src="/agent-py/workspace/68f0f702da6e3f448f9d8520/generated_images/d83c963806944a1a81300b4a5da19bfa.jpg"/>
+</div>
+<div class="news-content">
+<div class="news-title">华为开发者大会2022：鸿蒙生态扩展至智能汽车领域</div>
+<div class="news-desc">鸿蒙OS成为智能座舱操作系统首选，多家车企宣布搭载计划...</div>
+<div class="news-meta">
+<div class="news-source">科技日报</div>
+<div>5小时前</div>
+</div>
+</div>
+</div>
+<!-- 空状态 -->
+<!-- <div class="empty-state">
+        <span class="iconify" data-icon="ion:bookmark-outline" style="font-size: 48px; color: #BBBBBB;"></span>
+        <div class="text-xl my-4 text-[#666666]">暂无收藏</div>
+        <button class="retry-btn">去首页看看</button>
+      </div> -->
+</div>
+<div class="nav-bar">
+<div class="nav-item">
+<span class="iconify nav-icon" data-icon="ion:home-outline"></span>
+<div>首页</div>
+</div>
+<div class="nav-item active">
+<span class="iconify nav-icon" data-icon="ion:bookmark"></span>
+<div>我的收藏</div>
+</div>
+</div>
+</div>
+<!-- 页面4：加载状态页 -->
+<div class="app-page">
+<div class="fullscreen-center">
+<div class="loading-spinner"></div>
+<div class="mt-4 text-[#666666]">加载中...</div>
+</div>
+</div>
+<!-- 页面5：网络错误页 -->
+<div class="app-page">
+<div class="fullscreen-center">
+<span class="iconify" data-icon="ion:cloud-offline-outline" style="font-size: 64px; color: #FA2A2D;"></span>
+<div class="mt-4 text-center text-[#666666] px-8">网络连接失败，请检查网络设置</div>
+<button class="retry-btn">重试</button>
+</div>
+</div>
+<!-- 页面6：启动画面 -->
+<div class="app-page">
+<div class="fullscreen-center" style="background: linear-gradient(135deg, #007DFF, #00C8FF);">
+<span class="iconify" data-icon="ion:apps" style="font-size: 72px; color: white;"></span>
+<div class="text-2xl font-bold text-white mt-4">鸿蒙新闻</div>
+</div>
+</div>
+</body>
+</html>
