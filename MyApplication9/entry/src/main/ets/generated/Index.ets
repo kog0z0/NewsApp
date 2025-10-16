@@ -5,7 +5,6 @@ import { CommonConstants } from './common/CommonConstants';
 import { HomePage } from './pages/HomePage';
 import { NewsDetailPage } from './pages/NewsDetailPage';
 import { MyCollectionPage } from './pages/MyCollectionPage';
-import { ChannelManagementPage } from './pages/ChannelManagementPage';
 import { SearchPage } from './pages/SearchPage';
 import { PersonalCenterPage } from './pages/PersonalCenterPage';
 
@@ -67,14 +66,11 @@ struct Index {
           MyCollectionPage()
         }.tabBar(this.tabBuilder('我的收藏', 2, $r("app.media.lib_icon_53")))
       TabContent() {
-          ChannelManagementPage()
-        }.tabBar(this.tabBuilder('频道管理', 3, $r("app.media.lib_icon_0")))
-      TabContent() {
           SearchPage()
-        }.tabBar(this.tabBuilder('搜索', 4, $r("app.media.lib_icon_103")))
+        }.tabBar(this.tabBuilder('搜索', 3, $r("app.media.lib_icon_103")))
       TabContent() {
           PersonalCenterPage()
-        }.tabBar(this.tabBuilder('个人中心', 5, $r("app.media.lib_icon_1")))
+        }.tabBar(this.tabBuilder('个人中心', 4, $r("app.media.lib_icon_1")))
         }
         .barWidth(this.currentWidthBreakpoint === BreakpointConstants.BREAKPOINT_LG ? "96vp" : CommonConstants.FULL_PERCENT)
         .barHeight(this.currentWidthBreakpoint === BreakpointConstants.BREAKPOINT_LG ? CommonConstants.FULL_PERCENT : "76vp")

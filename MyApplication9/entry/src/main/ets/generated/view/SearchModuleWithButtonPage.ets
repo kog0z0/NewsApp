@@ -47,12 +47,6 @@ export default struct SearchModuleWithButtonPage {
   build() {
     NavDestination() {
       Row() {
-        Image($r('app.media.img'))
-          .width(40)
-          .height(40)
-          .onClick(() => {
-            this.onArrowClicked();
-          })
         Search({ placeholder: '搜索交通/酒店/景点等' })
           .searchButton('搜索')
           .enableKeyboardOnFocus(false)

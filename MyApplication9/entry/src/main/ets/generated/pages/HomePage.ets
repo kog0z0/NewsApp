@@ -1,5 +1,6 @@
 import { HorizontalTabNavModule } from '../view/HorizontalTabNavModule';
 import { NewsListModule } from '../view/NewsListModule';
+import { SearchInputModule } from '../view/SearchInputModule';
 
 @Component
 export struct HomePage {
@@ -7,8 +8,12 @@ export struct HomePage {
 
   build() {
     Flex({ direction: FlexDirection.Column }) {
+
       Scroll(this.scroller) {
         Column() {
+          //搜索框
+          SearchInputModule()
+
           HorizontalTabNavModule()
 					NewsListModule()
         }
