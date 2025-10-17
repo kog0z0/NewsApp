@@ -9,7 +9,7 @@ export struct MyCollectionPage {
     Flex({ direction: FlexDirection.Column }) {
       Scroll(this.scroller) {
         Column() {
-          UserProfileModule()
+          // UserProfileModule()
 					FavoriteNewsModule()
         }
         .width('100%')
