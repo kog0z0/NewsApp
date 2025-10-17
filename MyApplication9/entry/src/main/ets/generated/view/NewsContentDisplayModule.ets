@@ -1,5 +1,5 @@
 import { DataSource, DataSourceStyleAStyleA, DataSourceStyleBStyleB, DataSourceStyleCStyleC } from '../viewmodel/NewsContentDisplayModuleData';
-
+import { ModuleTitleComponent } from '../common/ModuleTitleComponent';
 @Component
 struct RankNumber {
   @Prop rank: number;
@@ -152,23 +152,33 @@ struct NewsCard {
 export struct NewsContentDisplayModule {
   @State model: DataSource = new DataSource();
   @Consume('appPathStack') appPathStack: NavPathStack;
-
+  @State moduleTitle: string = "新闻推荐";
+  @State moduleRedirectContent: string = "查看更多";
   jump(): void {
     this.appPathStack.pushPathByName('EmptyPagePathStack', null);
   }
 
   build() {
     Column() {
-      List() {
-        ForEach(this.model.getNewsList(), (newsItem: DataSourceStyleAStyleA) => {
-          ListItem() {
-            NewsCard({ news: newsItem })
-          }
+      Column(){
+        ModuleTitleComponent({ title: this.moduleTitle, moduleRedirectContent: this.moduleRedirectContent })
+        List() {
+          ForEach(this.model.getNewsList(), (newsItem: DataSourceStyleAStyleA) => {
+            ListItem() {
+              NewsCard({ news: newsItem })
+            }
 
-        }, (newsItem: DataSourceStyleAStyleA) => newsItem.getId())
+          }, (newsItem: DataSourceStyleAStyleA) => newsItem.getId())
+        }
+        .width('100%')
+        .divider({ strokeWidth: 0 })
+        .backgroundColor($r('app.color.module_item_bg_color'))
+        .borderRadius('5%')
       }
-      .width('100%')
-      .divider({ strokeWidth: 0 })
+      .borderRadius($r('sys.float.corner_radius_level8'))
+      .margin({ bottom: "10vp" })
+      .align(Alignment.Center)
+      .width('92%')
     }
     .width('100%')
     .backgroundColor($r('app.color.page_bg_color'))

@@ -66,7 +66,7 @@ struct Index {
         }.tabBar(this.tabBuilder('搜索', 2, $r("app.media.lib_icon_103")))
       TabContent() {
           PersonalCenterPage()
-        }.tabBar(this.tabBuilder('个人中心', 3, $r("app.media.lib_icon_1")))
+        }.tabBar(this.tabBuilder('个人中心', 3, $r("app.media.lib_icon_8")))
         }
         .barWidth(this.currentWidthBreakpoint === BreakpointConstants.BREAKPOINT_LG ? "96vp" : CommonConstants.FULL_PERCENT)
         .barHeight(this.currentWidthBreakpoint === BreakpointConstants.BREAKPOINT_LG ? CommonConstants.FULL_PERCENT : "76vp")

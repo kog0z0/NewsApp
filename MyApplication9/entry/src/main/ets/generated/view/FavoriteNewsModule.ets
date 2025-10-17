@@ -11,15 +11,14 @@ import { BreakpointConstants } from '../common/BreakpointConstants';
 import { BreakpointType } from '../util/BreakpointType';
 import LazyDataSource from '../util/LazyDataSource';
 import { CommonConstants } from '../common/CommonConstants';
-import { ModuleTitleComponent } from '../common/ModuleTitleComponent';
+
 
 @Component
 export struct FavoriteNewsModule {
   @State itemModel: Data =
     Data.getInstance();
   @Prop listDirection: Axis = Axis.Vertical
-  @State moduleTitle: string = "新闻阅读-我的收藏";
-  @State moduleRedirectContent: string = "查看更多";
+
   @State loadingStatus: LoadingStatus = LoadingStatus.OFF;
   @State lazyDataSource: LazyDataSource<DataSource> =
     this.itemModel.lazyDataSource;
@@ -45,7 +44,6 @@ export struct FavoriteNewsModule {
   build() {
     Column() {
       Column() {
-        ModuleTitleComponent({ title: this.moduleTitle, moduleRedirectContent: this.moduleRedirectContent })
 
         if (this.loadingStatus === LoadingStatus.FAILED) {
           LoadingFailedView(() => this.loadResources())
@@ -82,7 +80,7 @@ export struct FavoriteNewsModule {
         }
       }
       .borderRadius($r('sys.float.corner_radius_level8'))
-      .margin({ bottom: "10vp" })
+      .margin({top: "10vp", bottom: "10vp" })
       .align(Alignment.Center)
       .width('92%')
     }
@@ -102,26 +100,14 @@ export struct News_VerticalNovelInfoItem {
   build() {
     Column() {
       Row() {
-        /**
-         * TODO:
-         * please modify it according to the actual situation.
-         * directly modify {@link List_HorizontalGraphicTextDisplayItemModel#IMAGES}
-         * or refactor method {@code getResources()} to implement your custom code logic.
-         * @see List_HorizontalGraphicTextDisplayItemModel#getResources()
-         */
+
         Image(this.image)
           .margin({left: 8, right: 8 })
           .borderRadius($r('sys.float.corner_radius_level8'))
           .height('90%')
           .width('25%')
         Column() {
-          /**
-           * TODO:
-           * please modify it according to the actual situation.
-           * directly modify {@link List_HorizontalGraphicTextDisplayItemModel#MAIN_TEXT}
-           * or refactor method {@code getResources()} to implement your custom code logic.
-           * @see List_HorizontalGraphicTextDisplayItemModel#getResources()
-           */
+
           Text(this.mainText)
             .fontSize($r('app.integer.subtitle_text_M'))
             .fontColor($r('app.color.content_font_color'))
@@ -131,13 +117,7 @@ export struct News_VerticalNovelInfoItem {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .height('20%')
             .width(CommonConstants.FULL_PERCENT)
-          /**
-           * TODO:
-           * please modify it according to the actual situation.
-           * directly modify {@link List_HorizontalGraphicTextDisplayItemModel#SUB_TEXT}
-           * or refactor method {@code getResources()} to implement your custom code logic.
-           * @see List_HorizontalGraphicTextDisplayItemModel#getResources()
-           */
+
           Text(this.descriptionText)
             .fontSize($r('app.integer.caption_text_L'))
             .fontColor('#191919')

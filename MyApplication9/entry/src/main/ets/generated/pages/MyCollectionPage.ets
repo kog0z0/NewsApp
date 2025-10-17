@@ -1,4 +1,4 @@
-import { UserProfileModule } from '../view/UserProfileModule';
+
 import { FavoriteNewsModule } from '../view/FavoriteNewsModule';
 
 @Component
@@ -9,7 +9,10 @@ export struct MyCollectionPage {
     Flex({ direction: FlexDirection.Column }) {
       Scroll(this.scroller) {
         Column() {
+<<<<<<< Updated upstream
           // UserProfileModule()
+=======
+>>>>>>> Stashed changes
 					FavoriteNewsModule()
         }
         .width('100%')

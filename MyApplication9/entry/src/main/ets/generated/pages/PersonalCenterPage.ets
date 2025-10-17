@@ -1,6 +1,5 @@
 import { UserProfileModuleStyleA } from '../view/UserProfileModuleStyleA';
 import { ContentAssetsModule } from '../view/ContentAssetsModule';
-import { ServiceSettingModule } from '../view/ServiceSettingModule';
 
 @Component
 export struct PersonalCenterPage {
@@ -12,7 +11,6 @@ export struct PersonalCenterPage {
         Column() {
           UserProfileModuleStyleA()
 					ContentAssetsModule()
-					ServiceSettingModule()
         }
         .width('100%')
         .justifyContent(FlexAlign.Center)
