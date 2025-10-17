@@ -19,7 +19,6 @@ export struct RelatedNewsRecommendModule {
     Data.getInstance();
   @Prop listDirection: Axis = Axis.Vertical
   @State moduleTitle: string = "新闻推荐";
-  @State moduleRedirectContent: string = "查看更多";
   @State loadingStatus: LoadingStatus = LoadingStatus.OFF;
   @State lazyDataSource: LazyDataSource<DataSource> =
     this.itemModel.lazyDataSource;
@@ -45,7 +44,7 @@ export struct RelatedNewsRecommendModule {
   build() {
     Column() {
       Column() {
-        ModuleTitleComponent({ title: this.moduleTitle, moduleRedirectContent: this.moduleRedirectContent })
+        ModuleTitleComponent({ title: this.moduleTitle })
 
         if (this.loadingStatus === LoadingStatus.FAILED) {
           LoadingFailedView(() => this.loadResources())

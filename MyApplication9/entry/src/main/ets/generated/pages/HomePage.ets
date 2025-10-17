@@ -12,7 +12,6 @@ export struct HomePage {
 
       Scroll(this.scroller) {
         Column() {
-          //搜索框
           SearchInputModule()
 
           Flex({ direction: FlexDirection.Column }) {

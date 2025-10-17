@@ -1,3 +1,4 @@
+import { router } from '@kit.ArkUI';
 @Component
 export struct SearchInputModule {
   @State search_placeholder: string = "搜索新闻"
@@ -22,14 +23,23 @@ export struct SearchInputModule {
         .borderColor($r('sys.color.font_primary'))
         .searchIcon({ src: $r('sys.symbol.search_things') })
         .fontColor($r('sys.color.font_primary'))
-        // .onClick(() => {
-        //     // this.appPathStack.pushPathByName('SearchPagePathStack', null)
-        // })
-        // .onSubmit((value: string) => { // 监听搜索按钮提交事件
-        //   this.appPathStack.pushPathByName('SearchPagePathStack', {
-        //     keyword: value // 传递搜索关键词
-        //   });
-        // })
+        .onClick(() => {
+          router.pushUrl({
+            url: 'pages/SearchPage',
+            params: {
+              fromPage: 'HomePage'
+            }
+          });
+        })
+        .onSubmit((value: string) => {
+          router.pushUrl({
+            url: 'pages/SearchPage',
+            params: {
+              keyword: value,
+              fromPage: 'HomePage'
+            }
+          });
+        })
     }
   }
 }

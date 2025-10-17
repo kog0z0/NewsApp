@@ -3,8 +3,6 @@ import { SecondPageSearch } from './view/SecondPageSearch';
 import { BreakpointConstants } from './common/BreakpointConstants';
 import { CommonConstants } from './common/CommonConstants';
 import { HomePage } from './pages/HomePage';
-import { MyCollectionPage } from './pages/MyCollectionPage';
-import { SearchPage } from './pages/SearchPage';
 import { PersonalCenterPage } from './pages/PersonalCenterPage';
 
 @Entry
@@ -58,15 +56,10 @@ struct Index {
           TabContent() {
           HomePage()
         }.tabBar(this.tabBuilder('首页', 0, $r("app.media.lib_icon_186")))
-      TabContent() {
-          MyCollectionPage()
-        }.tabBar(this.tabBuilder('我的收藏', 1, $r("app.media.lib_icon_53")))
-      TabContent() {
-          SearchPage()
-        }.tabBar(this.tabBuilder('搜索', 2, $r("app.media.lib_icon_103")))
+
       TabContent() {
           PersonalCenterPage()
-        }.tabBar(this.tabBuilder('个人中心', 3, $r("app.media.lib_icon_8")))
+        }.tabBar(this.tabBuilder('个人中心', 1, $r("app.media.lib_icon_8")))
         }
         .barWidth(this.currentWidthBreakpoint === BreakpointConstants.BREAKPOINT_LG ? "96vp" : CommonConstants.FULL_PERCENT)
         .barHeight(this.currentWidthBreakpoint === BreakpointConstants.BREAKPOINT_LG ? CommonConstants.FULL_PERCENT : "76vp")

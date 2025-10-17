@@ -152,8 +152,7 @@ struct NewsCard {
 export struct NewsContentDisplayModule {
   @State model: DataSource = new DataSource();
   @Consume('appPathStack') appPathStack: NavPathStack;
-  @State moduleTitle: string = "新闻推荐";
-  @State moduleRedirectContent: string = "查看更多";
+  @State moduleTitle: string = "热点新闻";
   jump(): void {
     this.appPathStack.pushPathByName('EmptyPagePathStack', null);
   }
@@ -161,7 +160,7 @@ export struct NewsContentDisplayModule {
   build() {
     Column() {
       Column(){
-        ModuleTitleComponent({ title: this.moduleTitle, moduleRedirectContent: this.moduleRedirectContent })
+        ModuleTitleComponent({ title: this.moduleTitle })
         List() {
           ForEach(this.model.getNewsList(), (newsItem: DataSourceStyleAStyleA) => {
             ListItem() {

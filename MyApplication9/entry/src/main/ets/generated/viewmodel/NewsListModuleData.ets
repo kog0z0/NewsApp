@@ -20,14 +20,8 @@ export class Data {
     return Data.instance;
   }
 
-  /**
-   * Data loaded on current view converts network data into rendering data
-   */
   getResources(): Promise<void> {
 
-    /**
-     * use your web request here
-     */
     return new Promise((resolve: Function) => {
       const modelList: Array<HorizontalTextButtonFunctionItemModel> = [];
       for (let index = 0; index < Data.TITLES.length;

@@ -21,14 +21,6 @@ export struct ModuleTitleComponent {
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.font_primary'))
 
-        Text(this.moduleRedirectContent)
-          .fontColor($r('app.color.font_secondary'))
-          .fontSize($r('app.integer.body_text_S'))
-          .fontWeight(FontWeight.Medium)
-          .onClick(() => {
-            this.jump()
-          })
-
       }
       .width(CommonConstants.FULL_PERCENT)
       .height("44vp")

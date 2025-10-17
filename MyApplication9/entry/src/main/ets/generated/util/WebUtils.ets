@@ -59,16 +59,10 @@ function webBuilder(data: Data) {
 
 let wrap = wrapBuilder<Data[]>(webBuilder);
 
-/**
- * Controls and feeds back the behavior of the node on the corresponding NodeContainer.
- * It must be used together with NodeContainer.
- */
 export class MyNodeController extends NodeController {
   private rootNode: BuilderNode<Data[]> | null | undefined = null;
   private isRemove: boolean = false;
 
-  // Used to construct the number of nodes and return the node mount in the corresponding NodeContainer.
-  // This API is called when the corresponding NodeContainer is created or by using the rebuild method.
   makeNode(uiContext: UIContext): FrameNode | null {
     Logger.info('uiContext is undifined : ' + (uiContext === undefined));
     if (this.isRemove) {
@@ -127,7 +121,6 @@ export const getNWeb = (url: string): MyNodeController | undefined => {
   return nodeMap.get(url);
 }
 
-// Destruct the created node.
 export const deleteNode = (url: string) => {
   let nodeController = nodeMap.get(url);
   nodeController?.disposeNode();

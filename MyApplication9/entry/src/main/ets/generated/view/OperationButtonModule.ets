@@ -99,25 +99,13 @@ export struct DoubleStackGraphicTextItem {
 
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
-      /**
-       * TODO:
-       * please modify it according to the actual situation.
-       * directly modify {@link DataSource#IMAGES}
-       * or refactor method {@code getResources()} to implement your custom code logic.
-       * @see DataSource#getResources()
-       */
+
       Image(this.image)
         .width(CommonConstants.FULL_PERCENT)
         .height(CommonConstants.FULL_PERCENT)
         .borderRadius($r('sys.float.corner_radius_level8'))
       Column() {
-        /**
-         * TODO:
-         * please modify it according to the actual situation.
-         * directly modify {@link DataSource#TITLES}
-         * or refactor method {@code getResources()} to implement your custom code logic.
-         * @see DataSource#getResources()
-         */
+
         Text(this.title)
           .fontWeight(FontWeight.Medium)
           .fontSize($r('app.integer.subtitle_text_L'))
@@ -126,13 +114,7 @@ export struct DoubleStackGraphicTextItem {
           .maxLines(1)
           .width(CommonConstants.FULL_PERCENT)
           .fontColor($r('app.color.font_on_primary'))
-        /**
-         * TODO:
-         * please modify it according to the actual situation.
-         * directly modify {@link DataSource#CONTENTS}
-         * or refactor method {@code getResources()} to implement your custom code logic.
-         * @see DataSource#getResources()
-         */
+
         Text(this.content)
           .fontSize($r('app.integer.body_text_M'))
           .opacity(0.8)
