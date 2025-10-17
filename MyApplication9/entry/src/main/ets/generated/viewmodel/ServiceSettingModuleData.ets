@@ -5,8 +5,8 @@ export class Data {
   lazyDataSource: LazyDataSource<DataSource> = new LazyDataSource();
     static readonly ICONS: Resource[] = [$r('app.media.lib_icon_91'),$r('app.media.lib_icon_176'),$r('app.media.lib_icon_38'),$r('app.media.lib_icon_140')];
   static readonly TITLES: string[] = ['用户反馈', '系统设置', '清除缓存', '关于我们'];
-  static readonly DESCRIPTIONS: string[] = ['', '', '', ''];
-  static readonly ROUTETEXTS: string[] = ['跳转反馈页', '跳转设置页', '跳转清理页', '跳转详情页'];
+
+
   static readonly ROUTEICONS: Resource[] = [$r('app.media.ic_public_arrow_right'),$r('app.media.ic_public_arrow_right'),
 $r('app.media.ic_public_arrow_right'),$r('app.media.ic_public_arrow_right')];
 
@@ -21,14 +21,8 @@ $r('app.media.ic_public_arrow_right'),$r('app.media.ic_public_arrow_right')];
     return Data.instance;
   }
 
-  /**
-   * Data loaded on current view converts network data into rendering data
-   */
   getResources(): Promise<void> {
 
-    /**
-     * use your web request here
-     */
     return new Promise((resolve: Function) => {
       const modelList: Array<DataSource> = [];
       for (let index = 0; index < Data.ICONS.length;
@@ -36,8 +30,6 @@ $r('app.media.ic_public_arrow_right'),$r('app.media.ic_public_arrow_right')];
         modelList.push(new DataSource(
           Data.ICONS[index],
           Data.TITLES[index],
-          Data.DESCRIPTIONS[index],
-          Data.ROUTETEXTS[index],
           Data.ROUTEICONS[index]));
       }
       this.lazyDataSource.pushArrayData(modelList);
@@ -49,15 +41,11 @@ $r('app.media.ic_public_arrow_right'),$r('app.media.ic_public_arrow_right')];
 export class DataSource {
   private icon: Resource;
   private title: string;
-  private description: string;
-  private routeText: string;
   private routeIcon: Resource;
 
-  constructor(icon: Resource, title: string, description: string, routeText: string, routeIcon: Resource) {
+  constructor(icon: Resource, title: string, routeIcon: Resource) {
     this.icon = icon;
     this.title = title;
-    this.description = description;
-    this.routeText = routeText;
     this.routeIcon = routeIcon;
   }
 
@@ -67,14 +55,6 @@ export class DataSource {
 
   getTitle(): string {
     return this.title;
-  }
-
-  getDescription(): string {
-    return this.description;
-  }
-
-  getRouteText(): string {
-    return this.routeText;
   }
 
   getRouteIcon(): Resource {

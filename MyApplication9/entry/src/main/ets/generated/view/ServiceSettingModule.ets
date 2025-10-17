@@ -1,17 +1,3 @@
-/*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 import {
   DataSource,
@@ -32,7 +18,7 @@ export struct ServiceSettingModule {
   @State itemModel: Data =
     Data.getInstance();
   @Prop listDirection: Axis = Axis.Vertical
-  @State moduleTitle: string = "客服与设置";
+  @State moduleTitle: string = "设置";
   @State moduleRedirectContent: string = "查看更多";
   @State loadingStatus: LoadingStatus = LoadingStatus.OFF;
   @State lazyDataSource: LazyDataSource<DataSource> =
@@ -79,8 +65,6 @@ export struct ServiceSettingModule {
                 HorizontalGraphicTextFunctionItem1({
                   icon: item.getIcon(),
                   title: item.getTitle(),
-                  description: item.getDescription(),
-                  routeText: item.getRouteText(),
                   routeIcon: item.getRouteIcon()
                 })
               }
@@ -110,9 +94,7 @@ export struct ServiceSettingModule {
 @Component
 export struct HorizontalGraphicTextFunctionItem1 {
   @State title: string = '模块名';
-  @State description: string = '跳转';
   @State icon: Resource = $r("app.media.ic_public_app");
-  @State routeText: string = '跳转';
   @State routeIcon: Resource = $r('app.media.ic_public_arrow_right');
 
   build() {
@@ -133,12 +115,6 @@ export struct HorizontalGraphicTextFunctionItem1 {
             .maxLines(1)
             .padding({ bottom: 2 })
 
-          Text(this.description)
-            .fontColor($r('app.color.font_secondary'))
-            .fontSize($r('app.integer.body_text_S'))
-            .fontWeight(FontWeight.Regular)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .maxLines(1)
         }
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.Center)
@@ -149,14 +125,6 @@ export struct HorizontalGraphicTextFunctionItem1 {
       .width("80%")
 
       Row() {
-
-        Text(this.routeText)
-          .fontColor($r('app.color.font_tertiary'))
-          .fontSize($r('app.integer.body_text_S'))
-          .fontWeight(FontWeight.Regular)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .maxLines(1)
-          .opacity(0.8)
 
         Image(this.routeIcon)
           .width("12vp")
