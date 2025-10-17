@@ -1,25 +1,15 @@
-
 @Component
 export struct SearchInputModule {
   @State search_placeholder: string = "搜索新闻"
   @State buttonText: string = '搜索'
+  @State searchText: string = '';
   @State translateY: number = 0;
   @State transitionEffect: TransitionEffect = TransitionEffect.IDENTITY;
   @Consume('appPathStack') appPathStack: NavPathStack;
 
   build() {
-    /**
-     * TODO:
-     * please modify it according to the actual situation.
-     * modify {@link SearchModuleWithButton#search_placeholder}
-     */
-    Column(){
-      Search({ placeholder: this.search_placeholder })
-        /**
-         * TODO:
-         * please modify it according to the actual situation.
-         * modify {@link SearchModuleWithButton#buttonText}
-         */
+    Column() {
+      Search({ placeholder: this.search_placeholder, value: this.searchText })
         .searchButton(this.buttonText)
         .width("92%")
         .enableKeyboardOnFocus(false)
@@ -32,10 +22,14 @@ export struct SearchInputModule {
         .borderColor($r('sys.color.font_primary'))
         .searchIcon({ src: $r('sys.symbol.search_things') })
         .fontColor($r('sys.color.font_primary'))
-        .onClick(() => {
-          this.appPathStack.pushPathByName('SearchPagePathStack', null)
-        })
+        // .onClick(() => {
+        //     // this.appPathStack.pushPathByName('SearchPagePathStack', null)
+        // })
+        // .onSubmit((value: string) => { // 监听搜索按钮提交事件
+        //   this.appPathStack.pushPathByName('SearchPagePathStack', {
+        //     keyword: value // 传递搜索关键词
+        //   });
+        // })
     }
-    .width('100%')
   }
 }
