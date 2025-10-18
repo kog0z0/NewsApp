@@ -172,12 +172,19 @@ struct NewsDetail {
                 .width(65)
                 .visibility(!this.login? Visibility.None : Visibility.Visible)
                 .onClick(() =>{
+                  const now = new Date();
+                  const year = now.getFullYear();
+                  const month = String(now.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以要+1
+                  const day = String(now.getDate()).padStart(2, '0');
+                  const hours = String(now.getHours()).padStart(2, '0');
+                  const minutes = String(now.getMinutes()).padStart(2, '0');
+                  const currentTime = `${year}-${month}-${day} ${hours}:${minutes}`;
                 RdbUtils.insertOne("COMMENT",{
                   username:this.account,
                   mdesc:this.content,
                   head:'ic_default_head.png',
                   nid:this.bean.id,
-                  time:'2024-06-22 10:22'
+                  time: currentTime
                 }) .then((updateNumber) => {
                   promptAction.showToast({
                     message: "评论成功",
