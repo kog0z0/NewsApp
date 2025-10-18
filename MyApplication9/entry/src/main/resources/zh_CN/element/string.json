@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "模块描述"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "bottom_home",
+      "value": "首页"
+    },
+    {
+      "name": "bottom_hot",
+      "value": "热榜"
+    },
+    {
+      "name": "bottom_mine",
+      "value": "我的"
+    }
+  ]
+}

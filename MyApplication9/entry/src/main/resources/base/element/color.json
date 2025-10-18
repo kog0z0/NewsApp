@@ -1,48 +1,52 @@
 {
-  "color" : [ {
-    "name" : "start_window_background",
-    "value" : "#FFFFFF"
-  }, {
-    "name" : "app_icon_color",
-    "value" : "#BDBDBD"
-  }, {
-    "name" : "app_icon_pressed_color",
-    "value" : "#9E9E9E"
-  }, {
-    "name" : "page_bg_color",
-    "value" : "#F5F5F5"
-  }, {
-    "name" : "page_title_font_color",
-    "value" : "#616161"
-  }, {
-    "name" : "module_bg_color",
-    "value" : "#EEEEEE"
-  }, {
-    "name" : "module_title_font_color",
-    "value" : "#757575"
-  }, {
-    "name" : "module_icon_color",
-    "value" : "#9E9E9E"
-  }, {
-    "name" : "module_item_bg_color",
-    "value" : "#F3F3F2"
-  }, {
-    "name" : "content_main_title_font_color",
-    "value" : "#616161"
-  }, {
-    "name" : "content_sub_title_font_color",
-    "value" : "#757575"
-  }, {
-    "name" : "content_label_font_color",
-    "value" : "#9E9E9E"
-  }, {
-    "name" : "content_font_color",
-    "value" : "#000000"
-  }, {
-    "name" : "button_bg_color",
-    "value" : "#757575"
-  }, {
-    "name" : "button_font_color",
-    "value" : "#FFFFFF"
-  } ]
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "home_search_btn_background",
+      "value": "#FFFFFDFD"
+    },
+    {
+      "name": "bottom_btn_selected_background",
+      "value": "#FFFD3131"
+    },
+    {
+      "name": "bottom_btn_background",
+      "value": "#BC2B2525"
+    },
+    {
+      "name": "home_title_background",
+      "value": "#FFEA2222"
+    },
+    {
+      "name": "home_tabs_background",
+      "value": "#FFF8EDED"
+    },
+    {
+      "name": "items_background",
+      "value": "#FFFAF3F3"
+    },
+    {
+      "name": "items_background_hot",
+      "value": "#FFFAD7D7"
+    },
+    {
+      "name": "items_background_nor",
+      "value": "#FFF6F4F4"
+    },
+    {
+      "name": "logout_btn_background",
+      "value": "#FFF30606"
+    },
+    {
+      "name": "newsdetail_nologin_bg",
+      "value": "#F3F1EFEF"
+    },
+    {
+      "name": "newsdetail_title_bg",
+      "value": "#FFF5F1F1"
+    }
+  ]
 }

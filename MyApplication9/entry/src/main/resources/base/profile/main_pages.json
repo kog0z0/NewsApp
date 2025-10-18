@@ -1,3 +1,13 @@
 {
-  "src" : [ "generated/Index", "pages/Index" ]
+  "src": [
+    "pages/Index",
+    "pages/Login",
+    "pages/SearchPage",
+    "pages/NewsDetail",
+    "pages/MyCollect",
+    "pages/ModifyPwd",
+    "pages/MyComment",
+    "pages/AboutPage",
+    "pages/Register"
+  ]
 }
