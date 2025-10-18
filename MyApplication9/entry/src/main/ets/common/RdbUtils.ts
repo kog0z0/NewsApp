@@ -14,7 +14,7 @@ export default class RdbUtils {
     RdbUtils.rdbStore = store;
     //创建数据库表
     const NEWS_TABLE = 'CREATE TABLE IF NOT EXISTS NEWS (ID INTEGER PRIMARY KEY AUTOINCREMENT, IMAGE TEXT NOT NULL,TITLE TEXT NOT NULL,MDESC BLOB,TYPE INTEGER,TIME TEXT NOT NULL)';
-    const USERS_TABLE = 'CREATE TABLE IF NOT EXISTS USERS (ID INTEGER PRIMARY KEY AUTOINCREMENT, ACCOUNT TEXT NOT NULL,PASSWORD TEXT NOT NULL)';
+    const USERS_TABLE = 'CREATE TABLE IF NOT EXISTS USERS (ID INTEGER PRIMARY KEY AUTOINCREMENT, ACCOUNT TEXT NOT NULL, PASSWORD TEXT NOT NULL, AVATAR TEXT)';
     const COMMENT_TABLE = 'CREATE TABLE IF NOT EXISTS COMMENT (ID INTEGER PRIMARY KEY AUTOINCREMENT, HEAD TEXT NOT NULL,USERNAME TEXT NOT NULL,MDESC BLOB,NID INTEGER,TIME TEXT NOT NULL)';
     const COLLECT_TABLE = 'CREATE TABLE IF NOT EXISTS COLLECT (ID INTEGER PRIMARY KEY AUTOINCREMENT, USERNAME TEXT NOT NULL,NID INTEGER,TIME TEXT NOT NULL)';
 
@@ -22,13 +22,112 @@ export default class RdbUtils {
     this.executeSql(USERS_TABLE);
     this.executeSql(COMMENT_TABLE);
     this.executeSql(COLLECT_TABLE);
-    this.initData(); //初始化新闻数据
+
+    // 检查并升级数据库
+    this.upgradeDatabaseIfNeeded().then(() => {
+      this.initData(); //初始化新闻数据
+    });
+  }
+
+  // 添加数据库升级检查
+  static async upgradeDatabaseIfNeeded(): Promise<void> {
+    try {
+      console.info("Checking database structure...");
+
+      // 检查 USERS 表是否有 AVATAR 列
+      const result = await this.getStore().querySql("PRAGMA table_info(USERS)");
+      let hasAvatarColumn = false;
+      let columns = [];
+
+      while (result.goToNextRow()) {
+        const columnName = result.getString(result.getColumnIndex('name'));
+        const columnType = result.getString(result.getColumnIndex('type'));
+        columns.push(`${columnName} (${columnType})`);
+
+        if (columnName === 'AVATAR') {
+          hasAvatarColumn = true;
+        }
+      }
+
+      console.info("Current USERS table columns: " + columns.join(', '));
+
+      if (!hasAvatarColumn) {
+        console.info("Adding AVATAR column to USERS table...");
+        await this.executeSql('ALTER TABLE USERS ADD COLUMN AVATAR TEXT');
+        console.info("Successfully added AVATAR column");
+      } else {
+        console.info("AVATAR column already exists");
+      }
+
+    } catch (error) {
+      console.error("Database upgrade failed: " + error);
+    }
+  }
+
+  // 添加调试方法查看用户表内容
+  static async debugUsersTable(): Promise<void> {
+    try {
+      console.info("=== DEBUG: USERS TABLE CONTENTS ===");
+      const result = await this.getStore().querySql("SELECT * FROM USERS");
+      let rowCount = 0;
+      while (result.goToNextRow()) {
+        rowCount++;
+        const id = result.getLong(result.getColumnIndex('ID'));
+        const account = result.getString(result.getColumnIndex('ACCOUNT'));
+        const password = result.getString(result.getColumnIndex('PASSWORD'));
+        let avatar = '';
+        try {
+          avatar = result.getString(result.getColumnIndex('AVATAR')) || '';
+        } catch (e) {
+          avatar = 'NOT_FOUND';
+        }
+        console.info(`User ${rowCount}: ID=${id}, ACCOUNT=${account}, PASSWORD=${password}, AVATAR=${avatar}`);
+      }
+      console.info(`Total users: ${rowCount}`);
+      console.info("=== DEBUG END ===");
+    } catch (error) {
+      console.error("Debug query failed: " + error);
+    }
+  }
+
+  // 添加更新用户头像的方法
+  static async updateUserAvatar(account: string, avatarPath: string): Promise<number> {
+    let predicates = new relationalStore.RdbPredicates('USERS');
+    predicates.equalTo("account", account);
+
+    const valueBucket = {
+      "AVATAR": avatarPath
+    };
+
+    return RdbUtils.getStore().update(valueBucket, predicates);
+  }
+
+  // 添加获取用户头像的方法
+  static async getUserAvatar(account: string): Promise<string> {
+    let predicates = new relationalStore.RdbPredicates('USERS');
+    predicates.equalTo("account", account);
+
+    return new Promise<string>((resolve, reject) => {
+      RdbUtils.getStore().query(predicates).then((result) => {
+        let avatar = '';
+        while (result.goToNextRow()) {
+          // 获取 AVATAR 字段，如果不存在则返回空字符串
+          try {
+            avatar = result.getString(result.getColumnIndex('AVATAR')) || '';
+          } catch (e) {
+            avatar = '';
+          }
+        }
+        resolve(avatar);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
   }
 
   static setPreferences(dataPreferences: preferences.Preferences) {
     RdbUtils.dataPreferences = dataPreferences;
   }
-
 
   static initData() {
     const valueBucket = [
@@ -696,11 +795,14 @@ export default class RdbUtils {
       }
     ];
 
+    // 添加调试日志
+    console.info("Initializing news data...");
+
     RdbUtils.insert('NEWS', valueBucket)
       .then((updateNumber) => {
-        console.log('插入成功:' + updateNumber)
+        console.log('新闻数据插入成功:' + updateNumber)
       }).catch((error) => {
-      console.log('插入失败:' + error)
+      console.log('新闻数据插入失败:' + error)
     })
 
   }
@@ -727,28 +829,42 @@ export default class RdbUtils {
   static insertOne(tableName: string, data: any): Promise<number> {
     return RdbUtils.getStore().insert(tableName, data);
   }
-  static modifyPwd(username: string,pwd:string, data: any): Promise<number> {
-    let predicates = new relationalStore.RdbPredicates('USERS');
-    predicates.equalTo("account",username)
-    predicates.equalTo("password",pwd)
-    return RdbUtils.getStore().update(data,predicates)
+
+  // 添加用户注册方法
+  static async registerUser(account: string, password: string): Promise<number> {
+    console.info(`Registering user: ${account}`);
+
+    const valueBucket = {
+      'ACCOUNT': account,
+      'PASSWORD': password,
+      'AVATAR': '' // 初始为空字符串
+    };
+
+    return RdbUtils.insertOne('USERS', valueBucket);
   }
+
+  static modifyPwd(username: string, pwd: string, data: any): Promise<number> {
+    let predicates = new relationalStore.RdbPredicates('USERS');
+    predicates.equalTo("account", username)
+    predicates.equalTo("password", pwd)
+    return RdbUtils.getStore().update(data, predicates)
+  }
+
   static async queryByType(type: number): Promise<Array<NewsBean>> {
     let predicates = new relationalStore.RdbPredicates('NEWS');
-    predicates.equalTo("type", type); //根据条件查询
+    predicates.equalTo("type", type);
     return new Promise<Array<NewsBean>>((resolve, reject) => {
       RdbUtils.getStore().query(predicates).then((result) => {
         let newsList = new Array<NewsBean>();
         while (result.goToNextRow()) {
           let bean = new NewsBean(
-            result.getLong(0),
-            result.getString(1),
-            result.getString(2),
-            result.getString(3),
-            result.getLong(4),
-            result.getString(5),
+            result.getLong(result.getColumnIndex('ID')),
+            result.getString(result.getColumnIndex('IMAGE')),
+            result.getString(result.getColumnIndex('TITLE')),
+            result.getString(result.getColumnIndex('MDESC')),
+            result.getLong(result.getColumnIndex('TYPE')),
+            result.getString(result.getColumnIndex('TIME')),
           );
-          console.log(bean + '')
           newsList.push(bean);
         }
         resolve(newsList);
@@ -760,23 +876,21 @@ export default class RdbUtils {
 
   static async search(title: string): Promise<Array<NewsBean>> {
     let predicates = new relationalStore.RdbPredicates('NEWS');
-    predicates.like("title", "%" + title + "%"); //根据条件查询
+    predicates.like("title", "%" + title + "%");
     return new Promise<Array<NewsBean>>((resolve, reject) => {
       RdbUtils.getStore().query(predicates).then((result) => {
         let newsList = new Array<NewsBean>();
         while (result.goToNextRow()) {
           let bean = new NewsBean(
-            result.getLong(0),
-            result.getString(1),
-            result.getString(2),
-            result.getString(3),
-            result.getLong(4),
-            result.getString(5),
+            result.getLong(result.getColumnIndex('ID')),
+            result.getString(result.getColumnIndex('IMAGE')),
+            result.getString(result.getColumnIndex('TITLE')),
+            result.getString(result.getColumnIndex('MDESC')),
+            result.getLong(result.getColumnIndex('TYPE')),
+            result.getString(result.getColumnIndex('TIME')),
           );
-          console.log('0000000000000000000000' + JSON.stringify(bean))
           newsList.push(bean);
         }
-        console.log('news size:' + newsList.length)
         resolve(newsList);
       }).catch((error) => {
         reject(error)
@@ -784,43 +898,76 @@ export default class RdbUtils {
     })
   }
 
+  // 修复 queryUserByAccount 方法
   static async queryUserByAccount(account: string): Promise<Users> {
     let predicates = new relationalStore.RdbPredicates('USERS');
-    predicates.equalTo("account", account); //根据条件查询
+    predicates.equalTo("account", account);
+
+    console.info(`Querying user by account: ${account}`);
+
     return new Promise<Users>((resolve, reject) => {
       RdbUtils.getStore().query(predicates).then((result) => {
-        let bean;
+        let bean: Users | undefined;
+
+        // 先调试输出查询结果
+        let rowCount = 0;
         while (result.goToNextRow()) {
-          bean = new Users(
-            result.getLong(0),
-            result.getString(1),
-            result.getString(2),
-          );
+          rowCount++;
+          console.info(`Found user row ${rowCount}:`);
+
+          // 使用 getColumnIndex 安全地获取列值
+          try {
+            const id = result.getLong(result.getColumnIndex('ID'));
+            const accountVal = result.getString(result.getColumnIndex('ACCOUNT'));
+            const password = result.getString(result.getColumnIndex('PASSWORD'));
+            let avatar = '';
+
+            // 安全地获取 AVATAR 列
+            try {
+              avatar = result.getString(result.getColumnIndex('AVATAR')) || '';
+            } catch (e) {
+              console.warn("AVATAR column not found or error: " + e);
+              avatar = '';
+            }
+
+            console.info(`User data: ID=${id}, ACCOUNT=${accountVal}, PASSWORD=${password}, AVATAR=${avatar}`);
+
+            bean = new Users(id, accountVal, password, avatar);
+          } catch (error) {
+            console.error("Error parsing user row: " + error);
+          }
         }
+
+        console.info(`Total rows found for account ${account}: ${rowCount}`);
+
+        if (!bean) {
+          console.info(`No user found for account: ${account}`);
+        }
+
         resolve(bean);
       }).catch((error) => {
-        reject(error)
-      })
-    })
+        console.error("Query user failed: " + error);
+        reject(error);
+      });
+    });
   }
 
   static async queryNewsByID(id: number): Promise<NewsBean> {
     let predicates = new relationalStore.RdbPredicates('NEWS');
-    predicates.equalTo("id", id); //根据条件查询
+    predicates.equalTo("id", id);
     return new Promise<NewsBean>((resolve, reject) => {
       RdbUtils.getStore().query(predicates).then((result) => {
         let bean;
         while (result.goToNextRow()) {
           bean = new NewsBean(
-            result.getLong(0),
-            result.getString(1),
-            result.getString(2),
-            result.getString(3),
-            result.getLong(4),
-            result.getString(5),
+            result.getLong(result.getColumnIndex('ID')),
+            result.getString(result.getColumnIndex('IMAGE')),
+            result.getString(result.getColumnIndex('TITLE')),
+            result.getString(result.getColumnIndex('MDESC')),
+            result.getLong(result.getColumnIndex('TYPE')),
+            result.getString(result.getColumnIndex('TIME')),
           );
         }
-        console.log('0000000000000000000000' + JSON.stringify(bean))
         resolve(bean);
       }).catch((error) => {
         reject(error)
@@ -830,23 +977,21 @@ export default class RdbUtils {
 
   static async queryCommentByNewsID(nid: number): Promise<Array<Comment>> {
     let predicates = new relationalStore.RdbPredicates('COMMENT');
-    predicates.equalTo("nid", nid); //根据条件查询
+    predicates.equalTo("nid", nid);
     return new Promise<Array<Comment>>((resolve, reject) => {
       RdbUtils.getStore().query(predicates).then((result) => {
         let commList = new Array<Comment>();
         while (result.goToNextRow()) {
           let bean = new Comment(
-            result.getLong(0),
-            result.getString(1),
-            result.getString(2),
-            result.getString(3),
-            result.getLong(4),
-            result.getString(5),
+            result.getLong(result.getColumnIndex('ID')),
+            result.getString(result.getColumnIndex('HEAD')),
+            result.getString(result.getColumnIndex('USERNAME')),
+            result.getString(result.getColumnIndex('MDESC')),
+            result.getLong(result.getColumnIndex('NID')),
+            result.getString(result.getColumnIndex('TIME')),
           );
-          console.log('0000000000000000000000' + JSON.stringify(bean))
           commList.push(bean);
         }
-        console.log('comment size:' + commList.length)
         resolve(commList);
       }).catch((error) => {
         reject(error)
@@ -856,12 +1001,12 @@ export default class RdbUtils {
 
   static async queryCommentByAccount(account: string): Promise<Array<CommentItem>> {
     let predicates = new relationalStore.RdbPredicates('COMMENT');
-    predicates.equalTo("USERNAME", account); // 改为大写，与数据库字段一致
+    predicates.equalTo("USERNAME", account);
 
     return new Promise<Array<CommentItem>>((resolve, reject) => {
-      RdbUtils.getStore().query(predicates).then(async (result) => { // 添加 async
+      RdbUtils.getStore().query(predicates).then(async (result) => {
         let commList = new Array<CommentItem>();
-        const promises = []; // 用于存储所有异步操作
+        const promises = [];
 
         while (result.goToNextRow()) {
           let bean = new Comment(
@@ -873,9 +1018,6 @@ export default class RdbUtils {
             result.getString(result.getColumnIndex('TIME')),
           );
 
-          console.log('查询到评论: ' + JSON.stringify(bean))
-
-          // 将异步操作加入数组
           promises.push(
             this.queryNewsByID(bean.nid).then((newsBean: NewsBean) => {
               commList.push(new CommentItem(bean.id, bean.head, bean.username, bean.mdesc, bean.nid, bean.time, newsBean.image));
@@ -883,10 +1025,7 @@ export default class RdbUtils {
           );
         }
 
-        // 等待所有异步操作完成
         Promise.all(promises).then(() => {
-          console.log('最终评论列表大小:' + commList.length)
-          // 按时间倒序排序
           commList.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
           resolve(commList);
         }).catch(error => {
@@ -902,7 +1041,7 @@ export default class RdbUtils {
 
   static async queryCollectByAccount(account: string): Promise<Array<CollectBean>> {
     let predicates = new relationalStore.RdbPredicates('COLLECT');
-    predicates.equalTo("USERNAME", account); // 确保使用大写字段名
+    predicates.equalTo("USERNAME", account);
 
     return new Promise<Array<CollectBean>>((resolve, reject) => {
       RdbUtils.getStore().query(predicates).then((result) => {
@@ -914,10 +1053,8 @@ export default class RdbUtils {
             result.getLong(result.getColumnIndex('NID')),
             result.getString(result.getColumnIndex('TIME')),
           );
-          console.log('查询到的收藏记录: ' + JSON.stringify(bean))
           collList.push(bean);
         }
-        console.log('收藏列表大小:' + collList.length)
         resolve(collList);
       }).catch((error) => {
         console.error('查询收藏失败:', error);
@@ -928,22 +1065,20 @@ export default class RdbUtils {
 
   static async checkCollect(account: string, nid: number): Promise<Array<CollectBean>> {
     let predicates = new relationalStore.RdbPredicates('COLLECT');
-    predicates.equalTo("USERNAME", account); // 改为大写 USERNAME
-    predicates.equalTo("NID", nid); // 改为大写 NID
+    predicates.equalTo("USERNAME", account);
+    predicates.equalTo("NID", nid);
     return new Promise<Array<CollectBean>>((resolve, reject) => {
       RdbUtils.getStore().query(predicates).then((result) => {
         let collList = new Array<CollectBean>();
         while (result.goToNextRow()) {
           let bean = new CollectBean(
-            result.getLong(0),
-            result.getString(1),
-            result.getLong(2),
-            result.getString(3),
+            result.getLong(result.getColumnIndex('ID')),
+            result.getString(result.getColumnIndex('USERNAME')),
+            result.getLong(result.getColumnIndex('NID')),
+            result.getString(result.getColumnIndex('TIME')),
           );
-          console.log('检查收藏记录: ' + JSON.stringify(bean))
           collList.push(bean);
         }
-        console.log('checkCollect size:' + collList.length)
         resolve(collList);
       }).catch((error) => {
         reject(error)
@@ -953,6 +1088,56 @@ export default class RdbUtils {
 
   //保存缓存
   static saveCache(key: string, value: string) {
-    this.dataPreferences.put(key, value);
+    if (this.dataPreferences) {
+      this.dataPreferences.put(key, value).then(() => {
+        this.dataPreferences.flush();
+      });
+    }
+  }
+
+  // 添加从缓存获取数据的方法
+  static async getCache(key: string, defaultValue: string = ''): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      if (!this.dataPreferences) {
+        resolve(defaultValue);
+        return;
+      }
+      this.dataPreferences.get(key, defaultValue).then((value) => {
+        resolve(value.toString());
+      }).catch(() => {
+        resolve(defaultValue);
+      });
+    });
+  }
+
+  // 添加重置数据库方法（开发调试用）
+  static async resetDatabase(): Promise<void> {
+    try {
+      console.info("Resetting database...");
+
+      // 删除所有表
+      await this.executeSql('DROP TABLE IF EXISTS USERS');
+      await this.executeSql('DROP TABLE IF EXISTS NEWS');
+      await this.executeSql('DROP TABLE IF EXISTS COMMENT');
+      await this.executeSql('DROP TABLE IF EXISTS COLLECT');
+
+      console.info("Database reset completed");
+
+      // 重新创建表
+      const USERS_TABLE = 'CREATE TABLE IF NOT EXISTS USERS (ID INTEGER PRIMARY KEY AUTOINCREMENT, ACCOUNT TEXT NOT NULL, PASSWORD TEXT NOT NULL, AVATAR TEXT)';
+      const NEWS_TABLE = 'CREATE TABLE IF NOT EXISTS NEWS (ID INTEGER PRIMARY KEY AUTOINCREMENT, IMAGE TEXT NOT NULL,TITLE TEXT NOT NULL,MDESC BLOB,TYPE INTEGER,TIME TEXT NOT NULL)';
+      const COMMENT_TABLE = 'CREATE TABLE IF NOT EXISTS COMMENT (ID INTEGER PRIMARY KEY AUTOINCREMENT, HEAD TEXT NOT NULL,USERNAME TEXT NOT NULL,MDESC BLOB,NID INTEGER,TIME TEXT NOT NULL)';
+      const COLLECT_TABLE = 'CREATE TABLE IF NOT EXISTS COLLECT (ID INTEGER PRIMARY KEY AUTOINCREMENT, USERNAME TEXT NOT NULL,NID INTEGER,TIME TEXT NOT NULL)';
+
+      await this.executeSql(USERS_TABLE);
+      await this.executeSql(NEWS_TABLE);
+      await this.executeSql(COMMENT_TABLE);
+      await this.executeSql(COLLECT_TABLE);
+
+      console.info("Tables recreated successfully");
+
+    } catch (error) {
+      console.error("Database reset failed: " + error);
+    }
   }
 }
