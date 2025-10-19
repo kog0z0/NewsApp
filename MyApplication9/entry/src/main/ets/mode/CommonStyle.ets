@@ -109,6 +109,7 @@ export struct MyCommentItemStyle {
             .fontSize('12fp')
             .margin({ top: 10,bottom:10 })
             .fontColor("#c2bec2")
+
         }.alignItems(HorizontalAlign.Start).flexGrow(1)
         Image($rawfile(this.img)).width('90').height('90').margin({ left:20, right: "20px" }).borderRadius('10')
       }.width('100%')
