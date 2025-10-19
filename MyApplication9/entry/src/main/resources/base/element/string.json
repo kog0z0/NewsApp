@@ -23,6 +23,14 @@
     {
       "name": "bottom_mine",
       "value": "我的"
+    },
+    {
+      "name": "permission_read_imagevideo_reason",
+      "value": "允许应用读取相册图片用于设置用户头像"
+    },
+    {
+      "name": "permission_write_imagevideo_reason",
+      "value": "允许应用保存图片到相册"
     }
   ]
 }
